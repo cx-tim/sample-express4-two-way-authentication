@@ -18,8 +18,7 @@ app.all('*', function(req, res, next){
   if (req.secure) {
     return next();
   };
-  res.redirect('https://localhost:'+HTTPS_PORT+req.url);
-  // res.redirect('https://'+req.hostname+':'+HTTPS_PORT+req.url);
+  res.redirect('Please use HTTPs connection.');
 });
 
 // Hello World
@@ -32,8 +31,8 @@ app.get('/', function (req, res) {
 
 // HTTPS
 var secureServer = https.createServer({
-    key: fs.readFileSync('keys/private.key'),
-    cert: fs.readFileSync('keys/certificate.pem')
+    key: fs.readFileSync('ssl/server.key'),
+    cert: fs.readFileSync('ssl/server.pem')
   }, app)
   .listen(HTTPS_PORT, function () {
     console.log('Secure Server listening on port ' + HTTPS_PORT);
