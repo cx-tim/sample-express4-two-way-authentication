@@ -1,43 +1,39 @@
-var fs = require("fs");
-var express = require("express");
-var https = require('https');
-var http = require('http');
+const express = require("express");
+const fs      = require("fs");
+const http    = require('http');
+const https   = require('https');
 
-/////////////////////////////////////////////
+const HTTP_PORT  = 8080;
+const HTTPS_PORT = 8443;
 
-var HTTP_PORT = 3102;
-var HTTPS_PORT = 3101;
+const app = express();
 
-/////////////////////////////////////////////
 
-var app = express();
 
-// Route all Traffic to Secure Server
-// Order is important (this should be the first route)
-app.all('*', function(req, res, next){
-  if (req.secure) {
-    return next();
-  };
-  res.redirect('Please use HTTPs connection.');
+// Express Setup
+
+app.all('*', function(req, res) {
+  if (req.secure)
+    res.send('Hello World!');
+  else
+    res.send('Please use HTTPs connection.');
 });
 
-// Hello World
-app.get('/', function (req, res) {
-  res.send('Hello World!');
-});
 
-/////////////////////////////////////////////
-// Setup Servers
 
-// HTTPS
-var secureServer = https.createServer({
+// Server Setup
+
+http
+  .createServer(app)
+  .listen(HTTP_PORT, function() {
+    console.log('Insecure Server listening on port %d', HTTP_PORT);
+  });
+
+https
+  .createServer({
     key: fs.readFileSync('ssl/server.key'),
     cert: fs.readFileSync('ssl/server.pem')
   }, app)
-  .listen(HTTPS_PORT, function () {
-    console.log('Secure Server listening on port ' + HTTPS_PORT);
-});
-
-var insecureServer = http.createServer(app).listen(HTTP_PORT, function() {
-  console.log('Insecure Server listening on port ' + HTTP_PORT);
-})
+  .listen(HTTPS_PORT, function() {
+    console.log('Secure Server listening on port %d', HTTPS_PORT);
+  });
